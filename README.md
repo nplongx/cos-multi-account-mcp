@@ -1,97 +1,130 @@
 # COS Multi-Account MCP
 
-Operational documentation for the COS Multi-Account ContextForge MCP gateway.
+Private deployment project for a multi-user ContextForge MCP gateway that fronts COS Core, Desktop, and Plugins with per-user OAuth authentication and team-scoped RBAC.
 
-> **Deployment status:** development / trial. This repository documents a live deployment and its configuration contract. It is not a turnkey production deployment. Do not use the current Auth0 tenant or Google development keys for production.
+> **Status: development / trial.** The deployment and OAuth path have partial live evidence, but the complete ChatGPT-issued token -> email-claim -> ContextForge RBAC path is not yet accepted end to end. Do not treat the current Auth0/Google configuration as production-ready.
+
+## What this repository contains
+
+- A pinned ContextForge image and Docker build overlay.
+- RFC 9728 protected-resource metadata routing for OAuth-enabled team Virtual Servers.
+- Configurable JWT email-claim mapping for MCP access tokens.
+- A loopback-only Docker Compose deployment template.
+- Auth0 / Google OAuth, Cloudflare Tunnel and RBAC runbooks.
+- A placeholder-only environment template. It contains no deployment credentials.
+
+The Python files are adapted from IBM ContextForge and retain their Apache-2.0 SPDX notices. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
 ## Architecture
 
 ```text
-ChatGPT custom MCP connector
-  └─ OAuth 2.0 Authorization Code + PKCE
-       └─ Auth0 (Google social login)
-            └─ RS256 access token (RFC 9068)
-                 └─ ContextForge MCP gateway
-                      └─ user email claim + active local user
-                           └─ team membership / viewer RBAC
-                                ├─ COS Core
-                                ├─ COS Desktop
-                                └─ COS Plugins
+ChatGPT connection (one per user)
+        |
+        | OAuth 2.0 Authorization Code + PKCE
+        v
+Auth0 tenant (Google social login)
+        |
+        | RS256 access token; resource audience + verified email claim
+        v
+Cloudflare Named Tunnel
+        |
+        v
+ContextForge MCP gateway (127.0.0.1:4444)
+        |
+        | resolve active local user -> team membership -> RBAC
+        v
+Team Virtual Server
+   |          |          |
+ COS Core  COS Desktop  COS Plugins
 ```
 
-One MCP Virtual Server exposes three upstreams. Each ChatGPT account authorizes independently; do not share bearer tokens or upstream capability credentials between accounts.
+Each ChatGPT account authorizes independently and receives its own user token. Do not share bearer tokens, refresh tokens, Auth0 client secrets, or upstream capability credentials between users.
 
-## Deployed endpoint identifiers
+## Repository map
 
-| Setting | Value |
+| Path | Purpose |
 | --- | --- |
-| MCP endpoint / resource | `https://cos.bougainvillea.dpdns.org/servers/3ebe2c8df4b64304917f4ae0efcf6c803939f3b/mcp` |
-| Auth0 issuer | `https://dev-tyh0v4lmnge5xwa4.us.auth0.com/` |
-| OAuth API | `COS Multi-Account MCP` |
-| OAuth scope | `mcp:connect` plus `openid profile email` |
-| Token profile | RFC 9068, RS256 |
-| Email claim | `https://bougainvillea.dpdns.org/email` |
-| ContextForge Virtual Server | `COS Multi-Account` |
-| Visibility | `team` |
+| `Dockerfile`, `compose.yaml` | Reproducible local image build and loopback deployment |
+| `config.py` | ContextForge configuration overlay, including configurable MCP email claim |
+| `streamablehttp_transport.py` | MCP OAuth challenge and access-token identity mapping |
+| `routers/well_known.py` | RFC 9728 protected-resource metadata endpoints |
+| `services/server_service.py` | Team/OAuth-aware protected-resource metadata lookup |
+| `.env.example` | Placeholder-only secret/configuration template |
+| `docs/architecture.md` | Trust boundaries and request flow |
+| `docs/deployment.md` | Docker and Cloudflare deployment |
+| `docs/oauth-setup.md` | Auth0, Google and ChatGPT setup |
+| `docs/operations.md` | Health, access, backup and recovery |
+| `docs/verification.md` | Acceptance checks and current evidence |
+| `docs/deployment-guide.md` | Step-by-step operator runbook |
+| `SECURITY.md` | Secret-handling and security reporting rules |
 
-**Resource identifier note:** always copy the exact resource URI from the live ContextForge Virtual Server and its protected-resource metadata. The identifier is byte-for-byte significant. Do not copy a URI from an old note if it differs from the live server.
+## Quick start
 
-## Repository contents
+1. Review [SECURITY.md](SECURITY.md), [docs/deployment.md](docs/deployment.md), and [docs/oauth-setup.md](docs/oauth-setup.md).
+2. Copy `.env.example` to `.env`, replace every placeholder, and set file permissions to `0600`.
+3. Create the persistent volume, build, and start the gateway:
 
-- `docs/architecture.md` — request flow, trust boundaries and identity mapping.
-- `docs/deployment.md` — deployment contract and safe setup procedure.
-- `docs/oauth-setup.md` — Auth0, Google and ChatGPT connector configuration.
-- `docs/operations.md` — health, discovery, logs and recovery checks.
-- `docs/verification.md` — observed evidence and remaining acceptance tests.
-- `SECURITY.md` — secret handling and disclosure policy.
-- `.env.example` — placeholder-only environment template.
+   ```bash
+   cp .env.example .env
+   chmod 600 .env
+   # Edit .env before starting.
+   docker volume create cos-contextforge-data
+   docker compose build
+   docker compose up -d
+   ```
 
-The deployment's Python overlay files are intentionally not copied into this documentation repository. Keep application source in its own reviewed source repository; do not mistake this runbook for a complete build context.
+4. Confirm `curl -fsS http://127.0.0.1:4444/health` succeeds.
+5. Publish the loopback origin through a Cloudflare Named Tunnel. Keep the Admin UI/API behind Cloudflare Access.
+6. Configure Auth0 and Google using the exact resource URI exposed by the live ContextForge Virtual Server metadata. Never guess or reuse a stale resource identifier.
+7. Run the full checks in [docs/verification.md](docs/verification.md).
 
-## Quick checks
+This repository does not contain a live `.env`, database, tunnel credential, Auth0 secret, or ChatGPT token.
 
-The current host deployment uses Docker Compose and binds ContextForge to loopback. Run commands from the deployment directory:
+## Deployment contract
 
-```bash
-docker compose ps
-docker compose logs --tail=100 contextforge
-curl -fsS http://127.0.0.1:4444/health
-```
-
-The protected-resource metadata endpoint is public by design. An unauthenticated MCP POST should be rejected with HTTP 401 and a `WWW-Authenticate` metadata reference. A successful metadata response does **not** prove that an authenticated MCP call works.
-
-See the [detailed setup guide](GIST_LINK_PENDING) for step-by-step configuration and validation.
+- Base image is pinned by digest in [Dockerfile](Dockerfile).
+- ContextForge listens only on `127.0.0.1:4444`.
+- Docker uses host networking and persistent volume `cos-contextforge-data`.
+- The public MCP endpoint is `https://<your-hostname>/servers/<server-id>/mcp`.
+- The matching RFC 9728 metadata path is `https://<your-hostname>/.well-known/oauth-protected-resource/servers/<server-id>/mcp`.
+- The Auth0 API identifier, ContextForge protected resource, and metadata `resource` value must match byte-for-byte.
+- Admin UI/API must not be exposed directly to the Internet; use Cloudflare Access.
 
 ## Current acceptance status
 
-| Check | Evidence / status |
+Evidence recorded during initial setup:
+
+| Check | Status |
 | --- | --- |
-| Health endpoint | HTTP 200 observed |
+| ContextForge health endpoint | HTTP 200 observed |
 | RFC 9728 protected-resource metadata | HTTP 200 observed |
-| Unauthenticated MCP request | HTTP 401 observed |
-| ChatGPT OAuth authorization-code exchange | Auth0 recorded successful login and code exchange for one test account |
-| ChatGPT plugin creation | Created in ChatGPT UI |
-| MCP tool metadata | ChatGPT UI listed 19 tools in one inspection |
-| Server-side email claim and RBAC | **Not yet proven end-to-end** |
-| Refresh-token continuity | Not configured; `offline_access` not enabled |
+| Unauthenticated MCP POST | HTTP 401 observed |
+| Auth0 Google login and authorization-code exchange | Observed for one test identity |
+| ChatGPT custom MCP connector creation | Completed in ChatGPT UI |
+| ContextForge-issued tool inventory | 22 tools across three upstreams observed |
+| ChatGPT UI tool inventory | 19 tools observed in one UI inspection; counts can differ |
+| Server-side custom email claim and team RBAC for a ChatGPT-issued token | **Not yet proven end to end** |
+| Production IdP / Google OAuth client | **Not ready**; development/trial credentials were used |
 
-Tool counts can differ between upstream inventory and a particular ChatGPT UI snapshot. Recheck live `tools/list` before treating a count as acceptance evidence.
+Do not mark OAuth/RBAC acceptance complete until a real ChatGPT-issued token is validated by ContextForge and the expected user identity and team permission are verified server-side. See [docs/verification.md](docs/verification.md).
 
-## Security and deployment caveats
+## Detailed guide
 
-- This Auth0 tenant is a development/trial tenant.
-- Google social login currently uses Auth0 development keys. Replace them with an owned Google OAuth client before production.
-- The Google social connection was promoted at tenant/domain level for third-party OAuth. Review the wider application exposure before production.
-- The current OAuth setup does not request `offline_access`; long-lived refresh-token behavior is not established.
-- Auth0's post-login action requires a verified Google email and emits the namespaced email claim only for the exact MCP audience.
-- ContextForge must resolve that verified identity to an active local user and enforce team membership and RBAC on each request.
-- Cloudflare Access protects the Admin UI/API. Keep that boundary enabled.
-- Never put `.env`, database files, bootstrap passwords, API keys, client secrets, private keys, bearer tokens or refresh tokens in Git, Gists, issues or screenshots.
+The step-by-step operator guide is mirrored as an unlisted GitHub Gist:
 
-## Documentation
+**[COS Multi-Account MCP deployment guide](https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9)**
 
-See [docs/](docs/) and the linked step-by-step Gist. Review [SECURITY.md](SECURITY.md) before sharing this repository.
+Use the repository's `docs/` directory as the version-controlled source of truth. The Gist is a convenient walkthrough, not a secret store.
 
-## License and attribution
+## Security caveats
 
-The deployment overlay is adapted from IBM ContextForge, which is distributed under Apache-2.0. Any separately published derived source must retain required upstream copyright and license notices. This documentation bundle currently does not redistribute those overlay source files.
+- Current test setup used an Auth0 development/trial tenant and Google development keys. Replace them with an owned Google OAuth client and production-grade IdP configuration before production.
+- Review the tenant-wide exposure created when a Google social connection is promoted for third-party applications.
+- `offline_access` / refresh-token continuity was not part of the initial accepted test.
+- The Auth0 action must reject unverified email and emit the namespaced email claim only for the exact MCP audience.
+- ContextForge must resolve the verified email to an active local user and enforce team membership and RBAC on every request.
+- Never commit `.env`, database files, backups, bootstrap passwords, API keys, client secrets, private keys, bearer tokens, refresh tokens, Cloudflare credentials, or browser session data.
+
+## License
+
+The ContextForge-derived overlay is marked Apache-2.0 in its source headers. This repository includes the Apache-2.0 license text and attribution in [NOTICE](NOTICE).

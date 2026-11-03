@@ -1,0 +1,16 @@
+COS Multi-Account MCP deployment overlay
+
+The following files are adapted from the IBM ContextForge project and retain their
+upstream copyright/SPDX headers:
+
+- config.py
+- streamablehttp_transport.py
+- routers/well_known.py
+- services/server_service.py
+
+Upstream project: https://github.com/IBM/mcp-context-forge
+Upstream license: Apache License 2.0
+
+The deployment documentation and templates are project-specific operational
+material. Third-party names and marks remain the property of their respective
+owners.

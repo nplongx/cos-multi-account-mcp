@@ -1,0 +1,8 @@
+**
+!Dockerfile
+!config.py
+!streamablehttp_transport.py
+!routers/
+!routers/well_known.py
+!services/
+!services/server_service.py
