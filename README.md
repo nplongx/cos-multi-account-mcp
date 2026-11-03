@@ -1,6 +1,6 @@
 # COS Multi-Account MCP
 
-Private deployment project for a multi-user ContextForge MCP gateway that fronts COS Core, Desktop, and Plugins with per-user OAuth authentication and team-scoped RBAC.
+Deployment project for a multi-user ContextForge MCP gateway that fronts COS Core, Desktop, and Plugins with per-user OAuth authentication and team-scoped RBAC.
 
 > **Status: development / trial.** The deployment and OAuth path have partial live evidence, but the complete ChatGPT-issued token -> email-claim -> ContextForge RBAC path is not yet accepted end to end. Do not treat the current Auth0/Google configuration as production-ready.
 
@@ -56,6 +56,7 @@ Each ChatGPT account authorizes independently and receives its own user token. D
 | `docs/operations.md` | Health, access, backup and recovery |
 | `docs/verification.md` | Acceptance checks and current evidence |
 | `docs/deployment-guide.md` | Step-by-step operator runbook |
+| `docs/getting-started.md` | End-to-end setup guide and production gates |
 | `SECURITY.md` | Secret-handling and security reporting rules |
 
 ## Quick start
@@ -110,11 +111,15 @@ Do not mark OAuth/RBAC acceptance complete until a real ChatGPT-issued token is 
 
 ## Detailed guide
 
-The step-by-step operator guide is mirrored as an unlisted GitHub Gist:
+The setup walkthrough is also available as an unlisted GitHub Gist:
 
-**[COS Multi-Account MCP deployment guide](https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9)**
+**[COS Multi-Account MCP — setup guide](https://gist.github.com/nplongx/4ef72aa285ee4887e5b9ac2959c182f7)**
 
-Use the repository's `docs/` directory as the version-controlled source of truth. The Gist is a convenient walkthrough, not a secret store.
+The detailed operator runbook remains available here:
+
+**[COS Multi-Account MCP — operator runbook](https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9)**
+
+Use the repository's `docs/` directory as the version-controlled source of truth. Gists are convenience copies, not secret stores.
 
 ## Security caveats
 
