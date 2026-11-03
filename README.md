@@ -111,7 +111,7 @@ Do not mark OAuth/RBAC acceptance complete until a real ChatGPT-issued token is 
 
 ## Detailed guide
 
-The setup walkthrough is also available as an unlisted GitHub Gist:
+The setup walkthrough is also published as a public GitHub Gist:
 
 **[COS Multi-Account MCP — setup guide](https://gist.github.com/nplongx/4ef72aa285ee4887e5b9ac2959c182f7)**
 
