@@ -22,6 +22,12 @@ services:
       MCPGATEWAY_BULK_IMPORT_ENABLED: "false"
       MCPGATEWAY_A2A_ENABLED: "false"
       MCPGATEWAY_CATALOG_ENABLED: "true"
+      MCPGATEWAY_DIRECT_PROXY_ENABLED: "true"
+      IDENTITY_PROPAGATION_ENABLED: "true"
+      IDENTITY_PROPAGATION_MODE: "headers"
+      IDENTITY_PROPAGATION_HEADERS_PREFIX: "X-Forwarded-User"
+      IDENTITY_SIGN_CLAIMS: "true"
+      IDENTITY_CLAIMS_SECRET: ${COS_IDENTITY_HMAC_SECRET:?Set COS_IDENTITY_HMAC_SECRET in .env}
       SSRF_ALLOW_LOCALHOST: "true"
       SECURE_COOKIES: "false"
       GUNICORN_WORKERS: "2"
@@ -34,7 +40,60 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  cos-control-broker:
+    image: cos-contextforge:local
+    container_name: cos-control-broker
+    user: "10001:10001"
+    network_mode: host
+    restart: unless-stopped
+    depends_on:
+      contextforge:
+        condition: service_healthy
+    command:
+      - python
+      - -m
+      - uvicorn
+      - cos_control_broker:app
+      - --host
+      - 127.0.0.1
+      - --port
+      - "4445"
+      - --workers
+      - "1"
+    environment:
+      COS_CONTROL_API_URL: ${COS_CONTROL_API_URL:-http://127.0.0.1:37121}
+      COS_CONTROL_API_TOKEN_FILE: /run/secrets/cos-control-api-token
+      COS_IDENTITY_HMAC_SECRET: ${COS_IDENTITY_HMAC_SECRET:?Set COS_IDENTITY_HMAC_SECRET in .env}
+      COS_IDENTITY_HEADER_PREFIX: "X-Forwarded-User"
+      COS_AGENT_BROKER_DB_PATH: /data/cos-agent-broker.sqlite3
+      COS_AGENT_MAX_PER_USER: "10"
+      COS_CONTROL_API_TIMEOUT_SECONDS: "20"
+      COS_A2A_MAX_ENDPOINTS_PER_USER: ${COS_A2A_MAX_ENDPOINTS_PER_USER:-20}
+      COS_A2A_MAX_PENDING_PER_ENDPOINT: ${COS_A2A_MAX_PENDING_PER_ENDPOINT:-100}
+      COS_A2A_DEFAULT_TTL_SECONDS: ${COS_A2A_DEFAULT_TTL_SECONDS:-86400}
+      COS_A2A_MAX_TTL_SECONDS: ${COS_A2A_MAX_TTL_SECONDS:-604800}
+    volumes:
+      - "${COS_CONTROL_API_TOKEN_HOST_PATH:?Set COS_CONTROL_API_TOKEN_HOST_PATH in .env}:/run/secrets/cos-control-api-token:ro"
+      - cos-agent-broker-data:/data
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4445/healthz', timeout=3).read()"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   cos-contextforge-data:
     name: cos-contextforge-data
     external: true
+  cos-agent-broker-data:
+    name: cos-agent-broker-data

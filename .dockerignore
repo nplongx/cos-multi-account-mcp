@@ -6,3 +6,4 @@
 !routers/well_known.py
 !services/
 !services/server_service.py
+!cos_control_broker.py

@@ -5,3 +5,4 @@ COPY config.py /app/mcpgateway/config.py
 COPY streamablehttp_transport.py /app/mcpgateway/transports/streamablehttp_transport.py
 COPY routers/well_known.py /app/mcpgateway/routers/well_known.py
 COPY services/server_service.py /app/mcpgateway/services/server_service.py
+COPY cos_control_broker.py /app/cos_control_broker.py

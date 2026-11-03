@@ -21,7 +21,9 @@ Use `.env.example` only as a placeholder template. Keep the real `.env` file rea
 - Bind ContextForge to `127.0.0.1`; do not expose port 4444 directly.
 - Publish the MCP route only through the intended Cloudflare Tunnel.
 - Protect Admin UI/API paths with Cloudflare Access.
-- Keep the MCP endpoint protected by OAuth. An unauthenticated MCP request must fail closed.
+- Keep the MCP endpoint protected by OAuth. Unauthenticated `tools/list` may expose only fixed names and JSON schemas, never user/session data.
+- Every `tools/call` must fail closed unless ContextForge supplies a valid signed user identity; enforce owner scoping for every agent/session operation.
+- Every A2A endpoint and mailbox operation must be bound to the signed owner identity. New Workstream routing must use recipient-owned exact sender-endpoint allowlists, sender endpoint ownership, bounded TTL/size/queues, and idempotency. The tenant-wide directory may expose endpoint IDs, owner-asserted labels, state, and pseudonymous owner fingerprints only; never expose owner IDs, emails, credentials, or COS sessions. Legacy fingerprint ACLs remain only for backwards compatibility. Never accept caller-supplied sender identity as authority or use the mailbox to look up another owner's COS sessions.
 - Validate token signature, issuer, exact resource audience, expiry, scope, and verified email identity.
 - Resolve the email claim to an active local user and enforce team membership/RBAC on every request.
 - Do not share OAuth credentials between ChatGPT accounts.

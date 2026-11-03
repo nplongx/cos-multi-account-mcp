@@ -2217,6 +2217,30 @@ async def call_tool(
     # Cross-hook plugin state sharing on /mcp (issue #3879).
     plugin_global_context, plugin_context_table = _get_plugin_contexts_or_none()
 
+    # Streamable HTTP auth stores the verified identity in user_identity_var.
+    # When no HTTP_PRE_REQUEST plugin context exists (for example, with no
+    # plugins enabled), ToolService creates a fallback GlobalContext itself.
+    # Populate that context here so cached MCP gateway invocations still get
+    # the signed identity headers required by upstream per-user brokers.
+    # MCP SDK task boundaries may not preserve the identity ContextVar even
+    # though _get_request_context_or_default() returned the verified request
+    # auth context above. Rehydrate from that authenticated context (never from
+    # caller-supplied tool arguments or unsigned headers) before propagation.
+    if isinstance(user_context, dict):
+        _set_user_identity_from_dict(user_context)
+    authenticated_identity = user_identity_var.get()
+    if authenticated_identity:
+        if plugin_global_context is None:
+            content_type = request_headers.get("content-type") if request_headers else None
+            plugin_global_context = GlobalContext(
+                request_id=uuid4().hex,
+                server_id=server_id or "unknown",
+                user=authenticated_identity.email,
+                content_type=content_type,
+            )
+        if plugin_global_context.user_context is None:
+            plugin_global_context.user_context = authenticated_identity
+
     try:
         async with get_db() as db:
             # Use tool service for all tool invocations (handles direct_proxy internally)

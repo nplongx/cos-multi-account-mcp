@@ -10,6 +10,8 @@ Deployment project for a multi-user ContextForge MCP gateway that fronts COS Cor
 - RFC 9728 protected-resource metadata routing for OAuth-enabled team Virtual Servers.
 - Configurable JWT email-claim mapping for MCP access tokens.
 - A loopback-only Docker Compose deployment template.
+- A loopback-only COS Control API broker with per-ContextForge-user conversation ownership.
+- A durable, owner-authenticated A2A mailbox with endpoint allowlists, idempotent delivery, TTL, ACK, and reply.
 - Auth0 / Google OAuth, Cloudflare Tunnel and RBAC runbooks.
 - A placeholder-only environment template. It contains no deployment credentials.
 
@@ -31,11 +33,20 @@ Cloudflare Named Tunnel
         v
 ContextForge MCP gateway (127.0.0.1:4444)
         |
-        | resolve active local user -> team membership -> RBAC
+        | active local user -> team membership -> RBAC
         v
 Team Virtual Server
-   |          |          |
- COS Core  COS Desktop  COS Plugins
+   |          |          |                    |
+ COS Core  COS Desktop  COS Plugins   COS Control Broker
+                                           (127.0.0.1:4445)
+                                                 |
+                              +------------------+------------------+
+                              |                                     |
+                     owner-scoped agent registry           shared A2A mailbox
+                              |                           (SQLite + recipient ACL)
+                              v                                     |
+                    COS Local Control API                 Account A <-> Account B
+                    (127.0.0.1:37121)                    via signed ContextForge identities
 ```
 
 Each ChatGPT account authorizes independently and receives its own user token. Do not share bearer tokens, refresh tokens, Auth0 client secrets, or upstream capability credentials between users.
@@ -49,6 +60,7 @@ Each ChatGPT account authorizes independently and receives its own user token. D
 | `streamablehttp_transport.py` | MCP OAuth challenge and access-token identity mapping |
 | `routers/well_known.py` | RFC 9728 protected-resource metadata endpoints |
 | `services/server_service.py` | Team/OAuth-aware protected-resource metadata lookup |
+| `cos_control_broker.py` | Signed-identity, per-user broker for COS Local Control API |
 | `.env.example` | Placeholder-only secret/configuration template |
 | `docs/architecture.md` | Trust boundaries and request flow |
 | `docs/deployment.md` | Docker and Cloudflare deployment |
@@ -90,6 +102,16 @@ This repository does not contain a live `.env`, database, tunnel credential, Aut
 - The matching RFC 9728 metadata path is `https://<your-hostname>/.well-known/oauth-protected-resource/servers/<server-id>/mcp`.
 - The Auth0 API identifier, ContextForge protected resource, and metadata `resource` value must match byte-for-byte.
 - Admin UI/API must not be exposed directly to the Internet; use Cloudflare Access.
+- COS Control Broker binds only to `127.0.0.1:4445`; its Control API token is mounted read-only and never returned to MCP clients.
+- The broker trusts only HMAC-signed ContextForge user ID/email headers. It ignores forwarded admin/team claims and authorizes agent operations through its own owner registry.
+- A2A endpoints and messages are stored in the broker's persistent SQLite volume. Endpoint ACLs are private by default and keyed by the sender's verified ContextForge identity fingerprint.
+- A2A mailbox delivery is durable pull-based delivery. It does not auto-wake another ChatGPT tab, read another account's conversations, or delegate ChatGPT credentials.
+
+## Cross-account A2A mailbox
+
+Each Workstream registers its own `a2a_endpoint_register` endpoint under its authenticated ContextForge identity. Call `a2a_directory_list`, or read `peer_directory` from the existing `a2a_endpoint_list` tool, to discover active endpoints across the broker deployment. Endpoint owners configure `a2a_endpoint_set_peer_acl` with exact sender endpoint IDs, or use the backwards-compatible `a2a_endpoint_set_acl` schema with `sender_acl_token` values from `peer_directory`. This keeps Workstreams isolated even when two Workstreams share one ContextForge identity. Passing real owner fingerprints to the old setter retains legacy account-level ACL behavior only for endpoints not yet migrated. Senders use `a2a_send_message`; receivers use `a2a_inbox_read`, then `a2a_message_ack` or `a2a_message_reply`. Replies preserve the original correlation ID and acknowledge the original message atomically. `idempotency_key` prevents duplicate enqueue on retry. Mailbox delivery remains pull-based; a queued message does not wake another ChatGPT tab.
+
+Messages are durable across broker restarts, expire after the requested TTL (default 24 hours, maximum 7 days), and are bounded by endpoint and pending-inbox limits. A queued message is not proof the receiving agent has read or acted on it. `a2a_inbox_read` marks it received; ACK or reply is the explicit completion signal. This first implementation is a mailbox/router, not an automatic worker wake transport.
 
 ## Current acceptance status
 
@@ -129,6 +151,7 @@ Use the repository's `docs/` directory as the version-controlled source of truth
 - The Auth0 action must reject unverified email and emit the namespaced email claim only for the exact MCP audience.
 - ContextForge must resolve the verified email to an active local user and enforce team membership and RBAC on every request.
 - Never commit `.env`, database files, backups, bootstrap passwords, API keys, client secrets, private keys, bearer tokens, refresh tokens, Cloudflare credentials, or browser session data.
+- Broker-created conversations run under the ChatGPT account/profile currently signed in to the local COS runtime. They are not independent ChatGPT account credentials and do not provide separate account quotas.
 
 ## License
 
