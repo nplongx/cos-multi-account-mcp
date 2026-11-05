@@ -71,15 +71,11 @@ Store `MCP_RESOURCE_IDENTIFIER` and `MCP_EMAIL_CLAIM` as Action secrets. Set Con
 
 ## 4. Provision ContextForge users
 
-For every permitted person:
+Create the local ContextForge account and grant team membership before expecting the user's verified email claim to resolve to ContextForge permissions. For the current deployment, follow [the Auth0 Gmail provisioning runbook](sso-user-provisioning.md). It uses the administrator-only `EmailAuthService.create_sso_user()` path and adds the account to `COS Multi-Account` with the `member` membership role.
 
-1. Create or invite a local ContextForge user with the same verified email.
-2. Mark the account active.
-3. Add the user to the owning team.
-4. Assign the minimum required role/RBAC.
-5. Confirm that the Virtual Server is visible to that team.
+Do not confuse this operation with `SSOService.authenticate_or_create_user()`, which handles inbound SSO callbacks and JIT creation. The current provider has `auto_create_users=false`. A Google signup/login event in the ChatGPT Auth0 application is not local ContextForge provisioning and does not create team membership.
 
-An Auth0 social login must not silently create an unrestricted ContextForge account. The gateway must resolve the verified token identity to an already authorized local user.
+The gateway must resolve the verified token identity to an already authorized local user. Do not enable unrestricted JIT creation as a shortcut for adding approved people.
 
 ## 5. Configure ChatGPT
 

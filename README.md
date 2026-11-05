@@ -65,6 +65,7 @@ Each ChatGPT account authorizes independently and receives its own user token. D
 | `docs/architecture.md` | Trust boundaries and request flow |
 | `docs/deployment.md` | Docker and Cloudflare deployment |
 | `docs/oauth-setup.md` | Auth0, Google and ChatGPT setup |
+| `docs/sso-user-provisioning.md` | Admin-approved, passwordless Gmail provisioning and COS team membership |
 | `docs/operations.md` | Health, access, backup and recovery |
 | `docs/verification.md` | Acceptance checks and current evidence |
 | `docs/deployment-guide.md` | Step-by-step operator runbook |
