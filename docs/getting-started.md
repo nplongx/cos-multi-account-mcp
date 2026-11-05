@@ -113,9 +113,8 @@ Through the protected Admin UI:
 
 1. Sign in with the bootstrap administrator from .env; change bootstrap/default credentials immediately.
 2. Create a team.
-3. Create or invite each person as an active local user.
-4. Ensure each local email matches that person's verified Google identity.
-5. Add users to the team and assign least-privilege roles.
+3. Provision each explicitly approved person as an active local ContextForge user. For this deployment, use the administrator-driven passwordless Auth0 procedure below; a Google/Auth0 signup by itself does not create a local ContextForge user.
+4. Add each provisioned user to the team with the least-privilege membership role (`member` for ordinary COS Multi-Account access).
 6. Configure COS Core, COS Desktop, and COS Plugins as upstream MCP servers. Store upstream credentials only in ContextForge.
 7. Create a team-visible Virtual Server and enable OAuth.
 8. Record its live server ID.
@@ -128,6 +127,20 @@ curl -fsS \
 ~~~
 
 The metadata resource value is the canonical OAuth audience. Copy it exactly, including path and trailing-slash behavior. Never guess the server ID or reuse a stale resource URL.
+
+### Provision Gmail users for the current COS deployment
+
+Keep these identities separate:
+
+- **Auth0 + Google login** authenticates the Google identity.
+- **ContextForge local user** stores the active account and authorization state.
+- **COS Multi-Account membership** grants access to the team Virtual Server.
+
+For the current deployment, provision an explicitly approved Gmail address with `EmailAuthService.create_sso_user(email=..., auth_provider="auth0", is_admin=False, is_active=True, granted_by=...)`, then add it to `COS Multi-Account` with `TeamManagementService.add_member_to_team(..., role="member", grant_source="manual")`.
+
+Important: the enabled `auth0` provider record is required. Its `auto_create_users` setting is `false`, and global `sso_enabled` is currently `false`. The administrator service method is the intended path and deliberately bypasses JIT auto-create, trusted-domain, and approval checks, so use it only after explicit access approval. It creates a passwordless, non-admin account (`password_hash=NULL`, initially `email_verified=false`) and normal onboarding creates the personal team/default roles. Do not manually mark email verified, create another personal team, or use `viewer` as the COS membership role; the service accepts `owner` or `member`.
+
+Do not use `SSOService.authenticate_or_create_user()` for manual provisioning, do not enable global SSO just to add a user, and do not create a replacement Auth0 application. The REST endpoint `POST /v1/admin/users/sso` is conditional on SSO being enabled and is not the current route. Follow the [complete Gmail provisioning runbook](https://github.com/nplongx/cos-multi-account-mcp/blob/main/docs/sso-user-provisioning.md), including its dry-run script and verification checklist.
 
 ## 7. Configure Auth0 and Google
 

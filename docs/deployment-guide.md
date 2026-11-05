@@ -89,13 +89,23 @@ The intended public surface includes health and protected-resource discovery plu
 In the ContextForge admin interface:
 
 1. Create the team.
-2. Add each allowed person as an active local user with a verified email matching their Google identity.
-3. Add each user to the team and assign least-privilege RBAC.
+2. Provision each explicitly approved person as an active local ContextForge user. For the current COS deployment, use the administrator-driven passwordless Auth0 procedure below; a Google/Auth0 signup does not create the local user.
+3. Add each provisioned user to the team and assign least-privilege membership/RBAC (`member` for ordinary COS Multi-Account access).
 4. Configure the COS Core, Desktop, and Plugins upstream MCP servers.
 5. Create one team-visible Virtual Server with OAuth enabled.
 6. Retrieve its RFC 9728 protected-resource metadata.
 
 The live metadata `resource` is the canonical OAuth audience. Copy it exactly. Do not use an old URL or guess the Server ID.
+
+### Administrator-driven Gmail provisioning (current deployment)
+
+There are three separate layers: Auth0 + Google authenticates the person; the ContextForge local user stores the account; membership in `COS Multi-Account` grants team access. Google signup/login alone does not provision the local user or membership.
+
+For each explicitly approved address, call `EmailAuthService.create_sso_user(email=..., auth_provider="auth0", is_admin=False, is_active=True, granted_by=...)`, then `TeamManagementService.add_member_to_team(team_id=..., user_email=..., role="member", invited_by=..., grant_source="manual")`.
+
+The enabled `auth0` provider record is a prerequisite. Current deployment has `auto_create_users=false` and global `sso_enabled=false`; the admin service method remains usable and is intentionally separate from JIT. It bypasses JIT auto-create, trusted-domain, and approval checks, so only provision addresses with explicit approval. Created accounts are passwordless, active, non-admin, and initially `email_verified=false`; normal onboarding creates a personal team and configured default roles. Do not manually mark an email verified, duplicate personal teams, or use `viewer` as the membership role (`TeamManagementService` accepts `owner` and `member`).
+
+Do not use `SSOService.authenticate_or_create_user()` as the manual account-creation method, do not enable global SSO just to add users, and do not create a replacement Auth0 application. The REST `POST /v1/admin/users/sso` route is conditional on global SSO and is not the current provisioning path. Use the [full Gmail provisioning runbook](https://github.com/nplongx/cos-multi-account-mcp/blob/main/docs/sso-user-provisioning.md) for the dry-run-first script, idempotency behavior, and post-provisioning checks.
 
 ## 6. Configure Auth0
 
