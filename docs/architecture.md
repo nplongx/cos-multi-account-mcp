@@ -1,5 +1,7 @@
 # Architecture and trust boundaries
 
+> Language: English | [Tiếng Việt](architecture.vi.md)
+
 ## Request flow
 
 1. Each ChatGPT account creates its own OAuth connection to the same ContextForge Virtual Server.
@@ -68,6 +70,7 @@ The tools `agent_register`, `agent_list`, `agent_send_message`, `agent_read_mess
 ## A2A mailbox contract
 
 - `a2a_endpoint_register` creates an owner-bound endpoint. Endpoints are private by default.
+- `a2a_endpoint_delete` performs an owner-scoped soft retirement. The caller must supply the exact current label and `confirm_delete=true`. The broker revokes the endpoint's own ACLs, expires queued/received messages involving it, marks the endpoint disabled, and retains endpoint/message rows so existing message and reply references remain valid. Other endpoint owners' ACL configuration is not rewritten; inactive senders/recipients are rejected on every send. Retired endpoints are excluded from the active endpoint quota and active directory. This tool does not hard-purge historical records.
 - `a2a_directory_list` returns active routing records across the authenticated broker deployment. The existing `a2a_endpoint_list` also returns `peer_directory` for backwards compatibility with already-installed ChatGPT tool catalogs, while retaining caller-owned endpoints under `endpoints`. The directory exposes endpoint IDs, owner-asserted labels, state, pseudonymous owner fingerprints, and broker-scoped `sender_acl_token` values only. It does not reveal owner IDs, email addresses, credentials, or COS sessions. Labels are claims made by endpoint owners, not externally attested Workstream identities.
 - `a2a_endpoint_set_peer_acl` can only modify an endpoint owned by the caller and allowlists exact active sender endpoint IDs. This is the required mode for Workstream-to-Workstream isolation, including multiple Workstreams under one ContextForge identity. An empty list explicitly denies all senders and overrides any legacy fingerprint allowlist. Revoked queued/received messages are expired.
 - `a2a_endpoint_set_acl` remains backwards-compatible with the old 64-hex input schema. Passing `sender_acl_token` values from `peer_directory` through its existing `allowed_sender_fingerprints` field configures exact sender endpoint ACL mode. Passing real owner fingerprints retains legacy identity-level behavior only before exact mode is enabled. An empty list switches to exact deny-all mode. Once exact peer ACL mode is configured, the legacy setter refuses to downgrade the endpoint to broader identity-level permissions.

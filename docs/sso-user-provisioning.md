@@ -1,5 +1,7 @@
 # Provision Gmail users in ContextForge (Auth0)
 
+> Language: English | [Tiếng Việt](sso-user-provisioning.vi.md)
+
 Runbook for the current COS Multi-Account deployment. This documents explicit, administrator-approved, passwordless local-user provisioning. It is not an Auth0 application setup guide.
 
 ## Do not mix up the two authentication layers

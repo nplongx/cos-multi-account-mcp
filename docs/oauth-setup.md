@@ -1,8 +1,20 @@
 # OAuth setup: Auth0, Google, and ChatGPT
 
+> Language: English | [Tiếng Việt](oauth-setup.vi.md)
+
 This guide describes the configuration contract. Auth0 dashboard labels and ChatGPT connector capabilities can change; verify current provider behavior before production rollout.
 
+For a click-by-click walkthrough with real Auth0 and Cloudflare dashboard screenshots, see the [English walkthrough](dashboard-walkthrough.md) or [Vietnamese walkthrough](dashboard-walkthrough.vi.md).
+
+![Auth0 API, Google connection, Post-Login Action and ContextForge claim mapping](assets/auth0-flow.png)
+
+For the complete host, Cloudflare, ContextForge, and ChatGPT sequence, see [getting-started.md](getting-started.md). The diagram is illustrative; use the live metadata and values from your own deployment.
+
 ## 1. Create the Auth0 API
+
+![Auth0 APIs list in the development tenant; tenant identifier is outside the captured viewport](assets/en/auth0-apis-ui.jpg)
+
+The current dashboard lists `COS Multi-Account MCP` as a Custom API. Open its settings to review the Identifier and signing configuration; the Identifier must equal the live metadata `resource` value exactly. Do not copy an audience from a different API in the same tenant.
 
 Create an API whose Identifier is exactly the `resource` returned by the live ContextForge protected-resource metadata endpoint:
 
@@ -39,6 +51,8 @@ Avoid collecting broader Google scopes unless required.
 
 ## 3. Add a Post-Login Action
 
+> **Important — generic template vs. current tenant:** the sample below is a parameterized template that reads `MCP_RESOURCE_IDENTIFIER` and `MCP_EMAIL_CLAIM` from Action secrets. The Auth0 tenant shown in the screenshots currently uses a different, already-deployed `COS Email Identity` Action: its resource Identifier and claim URI are hard-coded in the Action code, its Secrets panel is empty, and it is already attached to Post Login. Do not add the two generic secrets to that existing Action unless you first replace its code with the parameterized template and review/test the change. See [the Vietnamese dashboard walkthrough](dashboard-walkthrough.vi.md#5-auth0-kiểm-tra-post-login-action) for the actual current state and screenshots.
+
 The Action must:
 
 - apply only to the exact MCP API audience;
@@ -67,7 +81,7 @@ exports.onExecutePostLogin = async (event, api) => {
 };
 ```
 
-Store `MCP_RESOURCE_IDENTIFIER` and `MCP_EMAIL_CLAIM` as Action secrets. Set ContextForge's `MCP_OAUTH_EMAIL_CLAIM` to the same claim URI.
+For this **generic template only**, store `MCP_RESOURCE_IDENTIFIER` and `MCP_EMAIL_CLAIM` as Action secrets. Set ContextForge's `MCP_OAUTH_EMAIL_CLAIM` to the same claim URI. Save and deploy the Action, then explicitly attach it to the Login flow; an un-deployed or unattached Action does not run for login events.
 
 ## 4. Provision ContextForge users
 

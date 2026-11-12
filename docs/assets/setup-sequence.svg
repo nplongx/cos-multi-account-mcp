@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      text{font-family:'DejaVu Sans',sans-serif;fill:#14243b}.title{font-size:38px;font-weight:700}.sub{font-size:18px;fill:#52647a}.h{font-size:21px;font-weight:700}.body{font-size:16px}.small{font-size:14px;fill:#52647a}.num{font-size:17px;font-weight:700;fill:#fff}
+    </style>
+    <marker id="a" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><path d="M1 1 L10 6 L1 11" fill="none" stroke="#8092a8" stroke-width="1.8"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#f3f6fb"/>
+  <text x="76" y="78" class="title">Setup sequence</text>
+  <text x="78" y="114" class="sub">Complete in order; keep credentials local and verify each trust boundary before onboarding users</text>
+
+  <g>
+    <rect x="80" y="190" width="680" height="130" rx="18" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <circle cx="130" cy="255" r="25" fill="#526d9b"/><text x="130" y="261" text-anchor="middle" class="num">1</text>
+    <text x="180" y="245" class="h">Prepare host and repository</text>
+    <text x="180" y="280" class="body">Linux · Docker Engine · Docker Compose v2 · persistent volume</text>
+  </g>
+  <g>
+    <rect x="840" y="190" width="680" height="130" rx="18" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <circle cx="890" cy="255" r="25" fill="#526d9b"/><text x="890" y="261" text-anchor="middle" class="num">2</text>
+    <text x="940" y="245" class="h">Configure .env</text>
+    <text x="940" y="280" class="body">Three independent random secrets · broker token file path · mode 0600</text>
+  </g>
+  <path d="M760 255 H830" stroke="#8092a8" stroke-width="3" marker-end="url(#a)"/>
+
+  <g>
+    <rect x="80" y="380" width="680" height="130" rx="18" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <circle cx="130" cy="445" r="25" fill="#19836c"/><text x="130" y="451" text-anchor="middle" class="num">3</text>
+    <text x="180" y="435" class="h">Build and start services</text>
+    <text x="180" y="470" class="body">ContextForge :4444 · Control Broker :4445 · health checks</text>
+  </g>
+  <g>
+    <rect x="840" y="380" width="680" height="130" rx="18" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <circle cx="890" cy="445" r="25" fill="#d97735"/><text x="890" y="451" text-anchor="middle" class="num">4</text>
+    <text x="940" y="435" class="h">Publish through Cloudflare</text>
+    <text x="940" y="470" class="body">Named Tunnel → 127.0.0.1:4444 · Access protects admin routes</text>
+  </g>
+  <path d="M1180 320 V370" stroke="#8092a8" stroke-width="3" marker-end="url(#a)"/>
+  <path d="M840 445 H770" stroke="#8092a8" stroke-width="3" marker-end="url(#a)"/>
+
+  <g>
+    <rect x="80" y="570" width="680" height="130" rx="18" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <circle cx="130" cy="635" r="25" fill="#19836c"/><text x="130" y="641" text-anchor="middle" class="num">5</text>
+    <text x="180" y="625" class="h">Configure ContextForge</text>
+    <text x="180" y="660" class="body">Users · team · upstreams · broker Gateway · Virtual Server</text>
+  </g>
+  <g>
+    <rect x="840" y="570" width="680" height="130" rx="18" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <circle cx="890" cy="635" r="25" fill="#7b5aab"/><text x="890" y="641" text-anchor="middle" class="num">6</text>
+    <text x="940" y="625" class="h">Configure Auth0</text>
+    <text x="940" y="660" class="body">API audience · Google login · Post-Login Action · claim mapping</text>
+  </g>
+  <path d="M1180 510 V560" stroke="#8092a8" stroke-width="3" marker-end="url(#a)"/>
+  <path d="M840 635 H770" stroke="#8092a8" stroke-width="3" marker-end="url(#a)"/>
+
+  <rect x="80" y="760" width="1440" height="88" rx="16" fill="#e9eef6" stroke="#c9d5e4"/>
+  <circle cx="130" cy="804" r="25" fill="#276a9b"/><text x="130" y="810" text-anchor="middle" class="num">7</text>
+  <text x="180" y="797" class="h">Connect ChatGPT independently and run the acceptance checklist</text>
+  <text x="180" y="827" class="small">A successful Google login alone does not prove MCP token validation, local-user mapping, or team RBAC.</text>
+</svg>

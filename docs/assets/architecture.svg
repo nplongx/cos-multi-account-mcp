@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      text{font-family:'DejaVu Sans',sans-serif;fill:#14243b}.title{font-size:38px;font-weight:700}.sub{font-size:18px;fill:#52647a}.h{font-size:22px;font-weight:700}.body{font-size:17px}.small{font-size:15px;fill:#52647a}.tag{font-size:14px;font-weight:700;letter-spacing:1px}
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><path d="M1 1 L10 6 L1 11" fill="none" stroke="#4c6b8a" stroke-width="1.8"/></marker>
+    <marker id="arrow2" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><path d="M1 1 L10 6 L1 11" fill="none" stroke="#6b7f99" stroke-width="1.8"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#f3f6fb"/>
+  <text x="76" y="78" class="title">COS Multi-Account MCP</text>
+  <text x="78" y="114" class="sub">End-to-end request path · one independently authorized ChatGPT connection per person</text>
+
+  <g>
+    <rect x="65" y="210" width="258" height="184" rx="18" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <rect x="65" y="210" width="258" height="12" rx="6" fill="#526d9b"/>
+    <text x="91" y="263" class="tag" fill="#526d9b">CLIENT</text>
+    <text x="91" y="302" class="h">ChatGPT</text>
+    <text x="91" y="336" class="body">Account A · Account B · …</text>
+    <text x="91" y="366" class="small">Each user authorizes separately</text>
+  </g>
+  <g>
+    <rect x="370" y="210" width="258" height="184" rx="18" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <rect x="370" y="210" width="258" height="12" rx="6" fill="#7b5aab"/>
+    <text x="396" y="263" class="tag" fill="#7b5aab">IDENTITY PROVIDER</text>
+    <text x="396" y="302" class="h">Auth0 + Google</text>
+    <text x="396" y="336" class="body">Auth Code + PKCE</text>
+    <text x="396" y="366" class="small">RS256 access token</text>
+  </g>
+  <g>
+    <rect x="675" y="210" width="258" height="184" rx="18" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <rect x="675" y="210" width="258" height="12" rx="6" fill="#d97735"/>
+    <text x="701" y="263" class="tag" fill="#b55d24">EDGE NETWORK</text>
+    <text x="701" y="302" class="h">Cloudflare</text>
+    <text x="701" y="336" class="body">Named Tunnel · HTTPS</text>
+    <text x="701" y="366" class="small">Origin stays loopback-only</text>
+  </g>
+  <g>
+    <rect x="980" y="210" width="258" height="184" rx="18" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <rect x="980" y="210" width="258" height="12" rx="6" fill="#19836c"/>
+    <text x="1006" y="263" class="tag" fill="#19836c">MCP GATEWAY</text>
+    <text x="1006" y="302" class="h">ContextForge</text>
+    <text x="1006" y="336" class="body">127.0.0.1:4444</text>
+    <text x="1006" y="366" class="small">JWT · verified email · RBAC</text>
+  </g>
+  <g>
+    <rect x="1285" y="210" width="250" height="184" rx="18" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <rect x="1285" y="210" width="250" height="12" rx="6" fill="#276a9b"/>
+    <text x="1311" y="263" class="tag" fill="#276a9b">TEAM SCOPE</text>
+    <text x="1311" y="302" class="h">Virtual Server</text>
+    <text x="1311" y="336" class="body">One shared MCP endpoint</text>
+    <text x="1311" y="366" class="small">Permissions restrict tool access</text>
+  </g>
+  <path d="M323 302 H362" fill="none" stroke="#4c6b8a" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M628 302 H667" fill="none" stroke="#4c6b8a" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M933 302 H972" fill="none" stroke="#4c6b8a" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M1238 302 H1277" fill="none" stroke="#4c6b8a" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="345" y="188" text-anchor="middle" class="small">OAuth</text>
+  <text x="650" y="188" text-anchor="middle" class="small">Bearer token</text>
+  <text x="955" y="188" text-anchor="middle" class="small">HTTPS</text>
+  <text x="1260" y="188" text-anchor="middle" class="small">MCP</text>
+
+  <path d="M1410 394 V474 H195 V520" fill="none" stroke="#6b7f99" stroke-width="2.5" stroke-dasharray="8 8" marker-end="url(#arrow2)"/>
+  <text x="790" y="462" text-anchor="middle" class="small">Team Virtual Server routes only the tools assigned to the team</text>
+  <g>
+    <rect x="65" y="535" width="330" height="142" rx="16" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <text x="92" y="582" class="h">COS Core</text>
+    <text x="92" y="618" class="body">Core MCP tools</text>
+    <text x="92" y="648" class="small">Credentials stay in ContextForge</text>
+  </g>
+  <g>
+    <rect x="425" y="535" width="330" height="142" rx="16" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <text x="452" y="582" class="h">COS Desktop</text>
+    <text x="452" y="618" class="body">Desktop automation tools</text>
+    <text x="452" y="648" class="small">Team-scoped tool permissions</text>
+  </g>
+  <g>
+    <rect x="785" y="535" width="330" height="142" rx="16" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+    <text x="812" y="582" class="h">COS Plugins</text>
+    <text x="812" y="618" class="body">Connected plugin tools</text>
+    <text x="812" y="648" class="small">Credentials stay server-side</text>
+  </g>
+  <g>
+    <rect x="1145" y="535" width="390" height="142" rx="16" fill="#eef5ff" stroke="#9bb7d7" stroke-width="2"/>
+    <text x="1172" y="582" class="h">COS Control Broker</text>
+    <text x="1172" y="618" class="body">127.0.0.1:4445 · signed identity</text>
+    <text x="1172" y="648" class="small">Owner-scoped agents + durable A2A mailbox</text>
+  </g>
+  <path d="M1410 475 V520 H230" fill="none" stroke="#6b7f99" stroke-width="2"/>
+  <path d="M230 520 V528 M590 520 V528 M950 520 V528 M1340 520 V528" stroke="#6b7f99" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+
+  <rect x="65" y="720" width="1470" height="116" rx="16" fill="#e9eef6" stroke="#c9d5e4"/>
+  <text x="94" y="760" class="tag" fill="#36516f">SECURITY CONTRACT</text>
+  <text x="94" y="795" class="body">Auth0 audience = live metadata resource · verified email claim = ContextForge mapping · active local user + team membership required</text>
+  <text x="94" y="821" class="small">Never share OAuth tokens, secrets, Cloudflare credentials, or upstream capabilities between users.</text>
+</svg>

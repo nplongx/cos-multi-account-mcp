@@ -1,5 +1,7 @@
 # Security Policy
 
+> Language: English | [Tiếng Việt](SECURITY.vi.md)
+
 ## Scope
 
 This repository contains a ContextForge deployment overlay and operator documentation. It is not a credential repository.

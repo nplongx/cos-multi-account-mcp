@@ -1,5 +1,7 @@
 # Verification and acceptance
 
+> Language: English | [Tiếng Việt](verification.vi.md)
+
 ## Safe baseline checks
 
 Run from the deployment host:

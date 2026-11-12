@@ -1,5 +1,7 @@
 # COS Multi-Account MCP
 
+> Language: English | [Tiếng Việt](README.vi.md)
+
 Deployment project for a multi-user ContextForge MCP gateway that fronts COS Core, Desktop, and Plugins with per-user OAuth authentication and team-scoped RBAC.
 
 > **Status: development / trial.** The deployment and OAuth path have partial live evidence, but the complete ChatGPT-issued token -> email-claim -> ContextForge RBAC path is not yet accepted end to end. Do not treat the current Auth0/Google configuration as production-ready.
@@ -62,6 +64,8 @@ Each ChatGPT account authorizes independently and receives its own user token. D
 | `services/server_service.py` | Team/OAuth-aware protected-resource metadata lookup |
 | `cos_control_broker.py` | Signed-identity, per-user broker for COS Local Control API |
 | `.env.example` | Placeholder-only secret/configuration template |
+| `docs/README.md` | English/Vietnamese documentation index |
+| `docs/dashboard-walkthrough.md` | English Auth0/Cloudflare screenshot tutorial |
 | `docs/architecture.md` | Trust boundaries and request flow |
 | `docs/deployment.md` | Docker and Cloudflare deployment |
 | `docs/oauth-setup.md` | Auth0, Google and ChatGPT setup |
@@ -110,7 +114,7 @@ This repository does not contain a live `.env`, database, tunnel credential, Aut
 
 ## Cross-account A2A mailbox
 
-Each Workstream registers its own `a2a_endpoint_register` endpoint under its authenticated ContextForge identity. Call `a2a_directory_list`, or read `peer_directory` from the existing `a2a_endpoint_list` tool, to discover active endpoints across the broker deployment. Endpoint owners configure `a2a_endpoint_set_peer_acl` with exact sender endpoint IDs, or use the backwards-compatible `a2a_endpoint_set_acl` schema with `sender_acl_token` values from `peer_directory`. This keeps Workstreams isolated even when two Workstreams share one ContextForge identity. Passing real owner fingerprints to the old setter retains legacy account-level ACL behavior only for endpoints not yet migrated. Senders use `a2a_send_message`; receivers use `a2a_inbox_read`, then `a2a_message_ack` or `a2a_message_reply`. Replies preserve the original correlation ID and acknowledge the original message atomically. `idempotency_key` prevents duplicate enqueue on retry. Mailbox delivery remains pull-based; a queued message does not wake another ChatGPT tab.
+Each Workstream registers its own `a2a_endpoint_register` endpoint under its authenticated ContextForge identity. Call `a2a_directory_list`, or read `peer_directory` from the existing `a2a_endpoint_list` tool, to discover active endpoints across the broker deployment. Endpoint owners configure `a2a_endpoint_set_peer_acl` with exact sender endpoint IDs, or use the backwards-compatible `a2a_endpoint_set_acl` schema with `sender_acl_token` values from `peer_directory`. This keeps Workstreams isolated even when two Workstreams share one ContextForge identity. Passing real owner fingerprints to the old setter retains legacy account-level ACL behavior only for endpoints not yet migrated. Use `a2a_endpoint_delete` to retire an endpoint owned by the caller; it requires exact label confirmation, revokes that endpoint's own ACLs, expires in-flight messages and preserves endpoint/message history as disabled tombstones. Retired endpoints no longer consume the active endpoint quota. Senders use `a2a_send_message`; receivers use `a2a_inbox_read`, then `a2a_message_ack` or `a2a_message_reply`. Replies preserve the original correlation ID and acknowledge the original message atomically. `idempotency_key` prevents duplicate enqueue on retry. Mailbox delivery remains pull-based; a queued message does not wake another ChatGPT tab.
 
 Messages are durable across broker restarts, expire after the requested TTL (default 24 hours, maximum 7 days), and are bounded by endpoint and pending-inbox limits. A queued message is not proof the receiving agent has read or acted on it. `a2a_inbox_read` marks it received; ACK or reply is the explicit completion signal. This first implementation is a mailbox/router, not an automatic worker wake transport.
 

@@ -1,5 +1,7 @@
 # Eight-Workstream A2A bootstrap — 2026-11-03
 
+> Language: English | [Tiếng Việt](a2a-workstream-bootstrap-2026-11-03.vi.md)
+
 ## Broker changes
 
 The broker now exposes two additional tools:

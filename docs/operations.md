@@ -1,5 +1,7 @@
 # Operations
 
+> Language: English | [Tiếng Việt](operations.vi.md)
+
 ## Health and discovery
 
 ```bash
@@ -13,6 +15,10 @@ https://<your-hostname>/.well-known/oauth-protected-resource/servers/<server-id>
 ```
 
 Confirm that its `resource`, `authorization_servers`, and `scopes_supported` values match the live Auth0 API configuration.
+
+## A2A startup on boot
+
+See [A2A autostart guide](a2a-autostart.md) for enabling the local bridge with systemd user services, Docker startup, OAuth first-run requirements, health checks, and reboot acceptance.
 
 ## Service lifecycle
 

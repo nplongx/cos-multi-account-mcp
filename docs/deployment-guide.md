@@ -1,10 +1,18 @@
 # COS Multi-Account MCP — operator runbook
 
+> Language: English | [Tiếng Việt](deployment-guide.vi.md)
+
 Repository: https://github.com/nplongx/cos-multi-account-mcp
 
 This runbook deploys one ContextForge MCP Virtual Server for a team. Each ChatGPT account authenticates independently using OAuth Authorization Code + PKCE. ContextForge validates the user's token, maps its verified email claim to an active local user, and enforces team membership/RBAC.
 
 > Development/trial status: the original test used Auth0 development keys. Replace those before production. Complete the server-side token/email/RBAC acceptance checks before production use.
+
+Start with the [end-to-end setup guide](getting-started.md). The diagrams and FFmpeg-rendered walkthrough are available there and in [`assets/`](assets/).
+
+For a beginner-oriented, screenshot-by-screenshot walkthrough of the Auth0 and Cloudflare dashboards, see the [English walkthrough](dashboard-walkthrough.md) or the [Vietnamese walkthrough](dashboard-walkthrough.vi.md).
+
+![COS Multi-Account request architecture](assets/architecture.png)
 
 ## 1. Understand the request path
 
@@ -51,11 +59,15 @@ Create a private environment file:
 ```bash
 cp .env.example .env
 chmod 600 .env
-openssl rand -hex 32
-openssl rand -hex 32
+for name in JWT_SECRET_KEY AUTH_ENCRYPTION_SECRET COS_IDENTITY_HMAC_SECRET; do
+  printf '%s=' "$name"
+  openssl rand -hex 32
+done
 ```
 
-Set separate generated values for `JWT_SECRET_KEY` and `AUTH_ENCRYPTION_SECRET`. Set unique admin and default-user passwords. Never put real values into GitHub or this Gist.
+Copy each generated value into its matching variable. Keep `JWT_SECRET_KEY`, `AUTH_ENCRYPTION_SECRET`, and `COS_IDENTITY_HMAC_SECRET` distinct. Set unique admin and default-user passwords. Never put real values into GitHub, screenshots, issues, or this Gist.
+
+Set `COS_CONTROL_API_TOKEN_HOST_PATH` to the broker-readable token copy, not to a token embedded in `.env`; follow [deployment.md](deployment.md#1-configure-secrets). The COS Control API must have `controlApi.enabled=true` and `controlApi.allowActions=true`.
 
 Set `APP_DOMAIN` to the external HTTPS hostname and `MCP_OAUTH_EMAIL_CLAIM` to the claim URI that Auth0 will issue.
 
@@ -63,16 +75,23 @@ Set `APP_DOMAIN` to the external HTTPS hostname and `MCP_OAUTH_EMAIL_CLAIM` to t
 
 ```bash
 docker volume create cos-contextforge-data
+docker compose config -q
 docker compose build
 docker compose up -d
 docker compose ps
 docker compose logs --tail=100 contextforge
+docker compose logs --tail=100 cos-control-broker
 curl -fsS http://127.0.0.1:4444/health
+curl -fsS http://127.0.0.1:4445/healthz
 ```
 
-The service must bind to `127.0.0.1:4444`. Do not expose port 4444 directly to the Internet.
+ContextForge must bind to `127.0.0.1:4444` and the broker to `127.0.0.1:4445`. Do not expose either port directly to the Internet.
 
 ## 4. Configure Cloudflare
+
+![Cloudflare Named Tunnel routing](assets/cloudflare-tunnel.png)
+
+![Cloudflare dashboard showing the existing cos-mcp tunnel as Healthy; account identity blurred](assets/en/cloudflare-tunnels-ui.jpg)
 
 Create a Named Tunnel route from your chosen hostname to:
 
@@ -92,8 +111,10 @@ In the ContextForge admin interface:
 2. Provision each explicitly approved person as an active local ContextForge user. For the current COS deployment, use the administrator-driven passwordless Auth0 procedure below; a Google/Auth0 signup does not create the local user.
 3. Add each provisioned user to the team and assign least-privilege membership/RBAC (`member` for ordinary COS Multi-Account access).
 4. Configure the COS Core, Desktop, and Plugins upstream MCP servers.
-5. Create one team-visible Virtual Server with OAuth enabled.
-6. Retrieve its RFC 9728 protected-resource metadata.
+5. Create a Gateway named `cos-control-broker` with URL `http://127.0.0.1:4445/mcp` and Gateway mode `direct_proxy`. Keep signed identity propagation enabled.
+6. Create one team-visible Virtual Server with OAuth enabled.
+7. Attach only the intended upstream servers and `cos-control-broker` Gateway to the Virtual Server. Grant intended team members `tools.read` and `tools.execute` permissions.
+8. Retrieve its RFC 9728 protected-resource metadata.
 
 The live metadata `resource` is the canonical OAuth audience. Copy it exactly. Do not use an old URL or guess the Server ID.
 
@@ -108,6 +129,8 @@ The enabled `auth0` provider record is a prerequisite. Current deployment has `a
 Do not use `SSOService.authenticate_or_create_user()` as the manual account-creation method, do not enable global SSO just to add users, and do not create a replacement Auth0 application. The REST `POST /v1/admin/users/sso` route is conditional on global SSO and is not the current provisioning path. Use the [full Gmail provisioning runbook](https://github.com/nplongx/cos-multi-account-mcp/blob/main/docs/sso-user-provisioning.md) for the dry-run-first script, idempotency behavior, and post-provisioning checks.
 
 ## 6. Configure Auth0
+
+![Auth0 API, Google connection and Post-Login Action flow](assets/auth0-flow.png)
 
 Create an Auth0 API:
 

@@ -1,5 +1,7 @@
 # Deployment
 
+> Language: English | [Tiếng Việt](deployment.vi.md)
+
 ## Prerequisites
 
 - Linux host with Docker Engine and Docker Compose v2.
@@ -85,7 +87,7 @@ This deployment keeps ContextForge's global `auto_refresh_servers` setting disab
 3. In each ChatGPT account profile, open Settings -> Plugins -> `COS Multi-Account` -> Refresh tools.
 4. Start a new conversation in each profile and verify the expected broker tool names are present before running cross-account A2A tests.
 
-For the A2A mailbox implementation, the nine tool names are `a2a_endpoint_register`, `a2a_endpoint_set_acl` (legacy fingerprint or endpoint-token compatibility), `a2a_endpoint_set_peer_acl` (exact sender endpoint ACL), `a2a_endpoint_list` (owned endpoints plus deployment-wide `peer_directory`), `a2a_directory_list` (authenticated deployment-wide directory), `a2a_send_message`, `a2a_inbox_read`, `a2a_message_ack`, and `a2a_message_reply`. Existing ChatGPT sessions can use `peer_directory` through the unchanged `a2a_endpoint_list` schema and configure exact endpoint ACLs through the unchanged `a2a_endpoint_set_acl` schema. New sessions can use the more explicit directory and endpoint ACL tools.
+For the A2A mailbox implementation, the ten tool names are `a2a_endpoint_register`, `a2a_endpoint_delete` (owner-scoped soft retirement with exact-label confirmation and message-history retention), `a2a_endpoint_set_acl` (legacy fingerprint or endpoint-token compatibility), `a2a_endpoint_set_peer_acl` (exact sender endpoint ACL), `a2a_endpoint_list` (owned endpoints plus deployment-wide `peer_directory`), `a2a_directory_list` (authenticated deployment-wide directory), `a2a_send_message`, `a2a_inbox_read`, `a2a_message_ack`, and `a2a_message_reply`. The broker active-endpoint quota counts only `state='active'` rows; retired `disabled` rows remain available to owner history views but are omitted from active routing directories. Existing ChatGPT sessions can use `peer_directory` through the unchanged `a2a_endpoint_list` schema and configure exact endpoint ACLs through the unchanged `a2a_endpoint_set_acl` schema. New sessions can use the more explicit directory and endpoint ACL tools.
 
 ## 5. Configure Auth0
 

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <style>
+      text{font-family:'DejaVu Sans',sans-serif;fill:#14243b}.title{font-size:38px;font-weight:700}.sub{font-size:18px;fill:#52647a}.h{font-size:24px;font-weight:700}.body{font-size:18px}.small{font-size:15px;fill:#52647a}.tag{font-size:14px;font-weight:700;letter-spacing:1px}
+    </style>
+    <marker id="a" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><path d="M1 1 L10 6 L1 11" fill="none" stroke="#4c6b8a" stroke-width="1.8"/></marker>
+  </defs>
+  <rect width="1600" height="900" fill="#f3f6fb"/>
+  <text x="76" y="78" class="title">Cloudflare Named Tunnel</text>
+  <text x="78" y="114" class="sub">Publish the MCP origin without opening a public listener on the host</text>
+
+  <rect x="70" y="250" width="350" height="220" rx="20" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+  <rect x="70" y="250" width="350" height="12" rx="6" fill="#19836c"/>
+  <text x="104" y="310" class="tag" fill="#19836c">LOCAL HOST</text>
+  <text x="104" y="360" class="h">ContextForge</text>
+  <text x="104" y="398" class="body">http://127.0.0.1:4444</text>
+  <text x="104" y="438" class="small">Host networking · loopback bind</text>
+
+  <rect x="625" y="250" width="350" height="220" rx="20" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+  <rect x="625" y="250" width="350" height="12" rx="6" fill="#d97735"/>
+  <text x="659" y="310" class="tag" fill="#b55d24">OUTBOUND CONNECTION</text>
+  <text x="659" y="360" class="h">Cloudflare Tunnel</text>
+  <text x="659" y="398" class="body">Named Tunnel connector</text>
+  <text x="659" y="438" class="small">Tunnel credentials stay on host</text>
+
+  <rect x="1180" y="250" width="350" height="220" rx="20" fill="#ffffff" stroke="#c9d5e4" stroke-width="2"/>
+  <rect x="1180" y="250" width="350" height="12" rx="6" fill="#526d9b"/>
+  <text x="1214" y="310" class="tag" fill="#526d9b">PUBLIC ORIGIN</text>
+  <text x="1214" y="360" class="h">mcp.example.com</text>
+  <text x="1214" y="398" class="body">HTTPS · DNS route</text>
+  <text x="1214" y="438" class="small">Replace with your hostname</text>
+
+  <path d="M420 360 H616" stroke="#4c6b8a" stroke-width="4" fill="none" marker-end="url(#a)"/>
+  <path d="M975 360 H1171" stroke="#4c6b8a" stroke-width="4" fill="none" marker-end="url(#a)"/>
+  <text x="518" y="330" text-anchor="middle" class="small">Origin service</text>
+  <text x="1074" y="330" text-anchor="middle" class="small">Encrypted tunnel</text>
+
+  <path d="M1355 470 V555 H480 V610" fill="none" stroke="#6b7f99" stroke-width="2.5" stroke-dasharray="8 8" marker-end="url(#a)"/>
+  <rect x="70" y="610" width="760" height="170" rx="18" fill="#eaf5f0" stroke="#9fcbb9" stroke-width="2"/>
+  <text x="108" y="660" class="tag" fill="#176b55">PUBLIC, OAUTH-PROTECTED ROUTES</text>
+  <text x="108" y="706" class="h">/servers/&lt;server-id&gt;/mcp</text>
+  <text x="108" y="746" class="body">/health · /.well-known/oauth-protected-resource/…</text>
+
+  <rect x="875" y="610" width="655" height="170" rx="18" fill="#fff2e8" stroke="#e6bb9c" stroke-width="2"/>
+  <text x="913" y="660" class="tag" fill="#a95727">RESTRICT WITH CLOUDFLARE ACCESS</text>
+  <text x="913" y="706" class="h">/admin/* + administrative APIs</text>
+  <text x="913" y="746" class="body">Separate Access application and least-privilege policy</text>
+
+  <rect x="70" y="815" width="1460" height="48" rx="12" fill="#e9eef6"/>
+  <text x="96" y="846" class="small">Do not change the origin to 0.0.0.0 or publish the Admin UI directly. Validate route patterns against the deployed ContextForge version.</text>
+</svg>
