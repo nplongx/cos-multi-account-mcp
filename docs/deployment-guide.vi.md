@@ -4,7 +4,11 @@
 
 Repository: https://github.com/nplongx/cos-multi-account-mcp
 
-Runbook này triển khai một ContextForge MCP Virtual Server cho một team. Mỗi ChatGPT account tự xác thực bằng OAuth Authorization Code + PKCE. ContextForge xác minh token của user, ánh xạ email claim đã xác minh tới local user active và thực thi team membership/RBAC.
+Gist công khai: https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9
+
+> **Phạm vi client được hỗ trợ:** Repository và operator runbook này chỉ dành cho [Chat on Steroids](https://github.com/totec448-spec/chat-on-steroids). Đây là client integration duy nhất nằm trong phạm vi setup và acceptance của dự án. MCP client, desktop application, agent và hệ thống automation khác chưa được kiểm chứng hoặc xác nhận; không được mặc định rằng chúng tương thích hoặc được hỗ trợ.
+
+Runbook này triển khai một ContextForge MCP Virtual Server cho một team. Mỗi ChatGPT account sử dụng thông qua Chat on Steroids tự xác thực bằng OAuth Authorization Code + PKCE. ContextForge xác minh token của user, ánh xạ email claim đã xác minh tới local user active và thực thi team membership/RBAC.
 
 > Trạng thái development/trial: lần test ban đầu dùng Auth0 development keys. Thay chúng trước production. Hoàn tất token/email/RBAC acceptance check phía server trước khi sử dụng production.
 

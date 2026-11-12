@@ -147,11 +147,11 @@ Không đánh dấu OAuth/RBAC acceptance hoàn tất cho tới khi ContextForge
 
 Setup walkthrough cũng được publish dưới dạng public GitHub Gist:
 
-**[COS Multi-Account MCP — setup guide](https://gist.github.com/nplongx/4ef72aa285ee4887e5b9ac2959c182f7)**
+**[COS Multi-Account MCP — setup guide (English + Vietnamese)](https://gist.github.com/nplongx/4ef72aa285ee4887e5b9ac2959c182f7)**
 
 Operator runbook chi tiết:
 
-**[COS Multi-Account MCP — operator runbook](https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9)**
+**[COS Multi-Account MCP — operator runbook (English + Vietnamese)](https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9)**
 
 Dùng `docs/` trong repository làm nguồn sự thật được version-control. Gist chỉ là bản tiện tra cứu, không phải nơi lưu secret.
 

@@ -144,11 +144,11 @@ Do not mark OAuth/RBAC acceptance complete until a real ChatGPT-issued token is 
 
 The setup walkthrough is also published as a public GitHub Gist:
 
-**[COS Multi-Account MCP — setup guide](https://gist.github.com/nplongx/4ef72aa285ee4887e5b9ac2959c182f7)**
+**[COS Multi-Account MCP — setup guide (English + Vietnamese)](https://gist.github.com/nplongx/4ef72aa285ee4887e5b9ac2959c182f7)**
 
 The detailed operator runbook remains available here:
 
-**[COS Multi-Account MCP — operator runbook](https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9)**
+**[COS Multi-Account MCP — operator runbook (English + Vietnamese)](https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9)**
 
 Use the repository's `docs/` directory as the version-controlled source of truth. Gists are convenience copies, not secret stores.
 

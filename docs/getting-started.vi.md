@@ -6,9 +6,11 @@
 
 **Operator runbook:** [deployment-guide.vi.md](deployment-guide.vi.md)
 
-**Bản Gist công khai cũ:** https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9
+**Gist công khai:** https://gist.github.com/nplongx/4ef72aa285ee4887e5b9ac2959c182f7
 
-Hướng dẫn này bao gồm chuẩn bị host, deployment, OAuth setup, kết nối ChatGPT và kiểm tra bảo mật. Thư mục `docs/` trong repository là nguồn sự thật được version-control; Gist cũ chỉ là bản tiện tra cứu và có thể không cập nhật bằng tài liệu này.
+> **Phạm vi client được hỗ trợ:** Repository và hướng dẫn setup này chỉ dành cho [Chat on Steroids](https://github.com/totec448-spec/chat-on-steroids). Đây là client integration duy nhất nằm trong phạm vi setup và acceptance của dự án. MCP client, desktop application, agent và hệ thống automation khác chưa được kiểm chứng hoặc xác nhận; không được mặc định rằng chúng tương thích hoặc được hỗ trợ.
+
+Hướng dẫn này bao gồm chuẩn bị host, deployment, OAuth setup, kết nối ChatGPT thông qua Chat on Steroids và kiểm tra bảo mật. Thư mục `docs/` trong repository là nguồn sự thật được version-control; Gist là bản mirror tiện tra cứu.
 
 > **Mới sử dụng Auth0 hoặc Cloudflare?** Làm theo [hướng dẫn dashboard từng bước bằng tiếng Việt](dashboard-walkthrough.vi.md). Hướng dẫn chỉ rõ cần bấm ở đâu, nhập gì và setting nào chỉ cần kiểm tra thay vì tạo lại.
 
@@ -324,4 +326,4 @@ Bằng chứng setup ban đầu gồm health HTTP 200, protected-resource metada
 - [Tài liệu deployment](https://github.com/nplongx/cos-multi-account-mcp/blob/main/docs/deployment.vi.md)
 - [Tham chiếu OAuth setup](https://github.com/nplongx/cos-multi-account-mcp/blob/main/docs/oauth-setup.vi.md)
 - [Checklist acceptance và verification](https://github.com/nplongx/cos-multi-account-mcp/blob/main/docs/verification.vi.md)
-- [Gist operator runbook chi tiết cũ](https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9)
+- [Gist operator runbook chi tiết](https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9)

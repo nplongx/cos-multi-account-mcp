@@ -4,7 +4,11 @@
 
 Repository: https://github.com/nplongx/cos-multi-account-mcp
 
-This runbook deploys one ContextForge MCP Virtual Server for a team. Each ChatGPT account authenticates independently using OAuth Authorization Code + PKCE. ContextForge validates the user's token, maps its verified email claim to an active local user, and enforces team membership/RBAC.
+Public Gist mirror: https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9
+
+> **Supported client scope:** This repository and deployment runbook are intended only for [Chat on Steroids](https://github.com/totec448-spec/chat-on-steroids). This is the only client integration covered by the project's setup and acceptance work. Other MCP clients, desktop applications, agents, and automation systems have not been validated or confirmed; do not assume compatibility or support.
+
+This runbook deploys one ContextForge MCP Virtual Server for a team. Each ChatGPT account used through Chat on Steroids authenticates independently using OAuth Authorization Code + PKCE. ContextForge validates the user's token, maps its verified email claim to an active local user, and enforces team membership/RBAC.
 
 > Development/trial status: the original test used Auth0 development keys. Replace those before production. Complete the server-side token/email/RBAC acceptance checks before production use.
 

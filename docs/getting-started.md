@@ -4,9 +4,11 @@
 
 **Repository:** https://github.com/nplongx/cos-multi-account-mcp
 **Operator runbook:** [deployment-guide.md](deployment-guide.md)
-**Older public Gist copy:** https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9
+**Public Gist mirror:** https://gist.github.com/nplongx/4ef72aa285ee4887e5b9ac2959c182f7
 
-This guide covers host preparation, deployment, OAuth setup, ChatGPT connection, and security checks. The repository's `docs/` directory is the version-controlled source of truth; the older public Gist is a convenience copy and may lag behind this file.
+> **Supported client scope:** This repository and setup guide are intended only for [Chat on Steroids](https://github.com/totec448-spec/chat-on-steroids). This is the only client integration covered by the project's setup and acceptance work. Other MCP clients, desktop applications, agents, and automation systems have not been validated or confirmed; do not assume compatibility or support.
+
+This guide covers host preparation, deployment, OAuth setup, ChatGPT connection through Chat on Steroids, and security checks. The repository's `docs/` directory is the version-controlled source of truth; the public Gist is a convenience mirror.
 
 > **New to Auth0 or Cloudflare?** Follow the [step-by-step dashboard walkthrough in English](dashboard-walkthrough.md) or [Vietnamese](dashboard-walkthrough.vi.md). It shows where to click, what to enter, and which existing settings must only be checked rather than recreated.
 
@@ -322,4 +324,4 @@ Initial setup evidence included health HTTP 200, protected-resource metadata HTT
 - [Deployment documentation](https://github.com/nplongx/cos-multi-account-mcp/blob/main/docs/deployment.md)
 - [OAuth setup reference](https://github.com/nplongx/cos-multi-account-mcp/blob/main/docs/oauth-setup.md)
 - [Acceptance and verification checklist](https://github.com/nplongx/cos-multi-account-mcp/blob/main/docs/verification.md)
-- [Existing detailed operator runbook Gist](https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9)
+- [Detailed operator runbook Gist](https://gist.github.com/nplongx/1f17336a782a99fb4d0d15181532a5b9)
