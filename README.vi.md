@@ -6,6 +6,10 @@ Dự án triển khai ContextForge MCP gateway đa người dùng, đứng trư�
 
 > **Trạng thái: development / trial.** Đường triển khai và OAuth đã có một phần bằng chứng live, nhưng luồng đầy đủ ChatGPT-issued token -> email claim -> ContextForge RBAC chưa được nghiệm thu end-to-end. Không coi cấu hình Auth0/Google hiện tại là sẵn sàng production.
 
+## Phạm vi client được hỗ trợ
+
+Repository này **chỉ dành cho [Chat on Steroids](https://github.com/totec448-spec/chat-on-steroids)**. Đây là client integration duy nhất nằm trong phạm vi setup và acceptance của dự án. Việc sử dụng với MCP client, desktop application, agent hoặc hệ thống automation khác **chưa được kiểm chứng hoặc xác nhận**; không được mặc định rằng các use case đó tương thích hoặc được hỗ trợ.
+
 ## Repository này bao gồm
 
 - ContextForge image được pin phiên bản và Docker build overlay.

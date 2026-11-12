@@ -6,6 +6,10 @@ Deployment project for a multi-user ContextForge MCP gateway that fronts COS Cor
 
 > **Status: development / trial.** The deployment and OAuth path have partial live evidence, but the complete ChatGPT-issued token -> email-claim -> ContextForge RBAC path is not yet accepted end to end. Do not treat the current Auth0/Google configuration as production-ready.
 
+## Supported project scope
+
+This repository is intended **only for use with [Chat on Steroids](https://github.com/totec448-spec/chat-on-steroids)**. That is the sole client integration covered by this project's setup and acceptance work. Use with other MCP clients, desktop applications, agents, or automation systems has **not been validated or confirmed**; compatibility and support for those use cases must not be assumed.
+
 ## What this repository contains
 
 - A pinned ContextForge image and Docker build overlay.
